@@ -24,6 +24,7 @@
     <li><a href="#Button">The Infamous Button</a></li>
     <li><a href="#Photo">a photo.</a></li>
     <li><a href="#simpleSlider">slider...</a></li>
+    <li><a href="#type">type stuf</a></li>
     <li><a href="#contact">ask 4 more</a></li>
   </ul>
 </nav>
@@ -57,6 +58,28 @@
     display.textContent = slider.value;
   });
 </script>
+
+
+<section id="type" style="padding:50px; text-align:center; font-family: Consolas, 'Courier New', monospace;">
+  <h2>type</h2>
+  <p>type stuff in the box (⌐■_■)</p>
+
+  <input type="text" id="userInput" placeholder="Type here..." style="font-size:16px; padding:5px;">
+  <div id="displayText" style="margin-top:20px; font-size:18px; color:green;"></div>
+</section>
+
+<script>
+  const input = document.getElementById('userInput');
+  const display = document.getElementById('displayText');
+
+  input.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      display.textContent = `You typed: "${input.value}"`;
+      input.value = ''; // clear input
+    }
+  });
+</script>
+
 
 
 
