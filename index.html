@@ -15,17 +15,18 @@
   <header>
     <h1>(╯°□°）╯Da Website</h1>
     <div>
-    <h6>wow so cool!</h6>
+    <h6>wow so cool!</h6><hr>
     </div>
   </header>
 
-  <nav>
-    <ul>
-      <li><a href="#Button">The Infamous Button</a></li>
-      <li><a href="#Photo">a photo.</a></li>
-      <li><a href="#contact">ask 4 more</a></li>
-    </ul>
-  </nav>
+<nav>
+  <ul>
+    <li><a href="#Button">The Infamous Button</a></li>
+    <li><a href="#Photo">a photo.</a></li>
+    <li><a href="#simpleSlider">slider...</a></li>
+    <li><a href="#contact">ask 4 more</a></li>
+  </ul>
+</nav>
 
 <section id="Button">
     <h2>The Infamous Button</h2>
@@ -39,6 +40,24 @@
     <p>behold upon the derpiness</p>
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDmntdhhitnK1rEsFhjrGBNZhmMYuqKsbQMg&s" alt="Derpy Photo" width="200">
 </section>
+
+
+<section id="simpleSlider" style="padding:50px; text-align:center; font-family: Consolas, 'Courier New', monospace;">
+  <h2>slider thing</h2>
+  <input type="range" min="0" max="100" value="50" id="mySlider">
+  <p>slide it :1</p>
+</section>
+
+
+<script>
+  const slider = document.getElementById('mySlider');
+  const display = document.getElementById('sliderValue');
+
+  slider.addEventListener('input', () => {
+    display.textContent = slider.value;
+  });
+</script>
+
 
 
   <section id="contact">
