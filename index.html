@@ -28,18 +28,21 @@
     <li><a href="#gallery">the gallery</a></li>
     <li><a href="#simpleSlider">slider...</a></li>
     <li><a href="#type">type stuf</a></li>
+    <li><a href="#time">time wasted</a></li>
+    <li><a href="#music">cool beats</a></li>
     <li><a href="#contact">ask 4 more</a></li>
   </ul>
 </nav>
 
-<section id="gallery">
+<section id="Button">
+  <section style="text-align:center; padding:40px; font-family: Consolas, 'Courier New', monospace;"></section>
     <h2>The Infamous Button</h2>
     <p>enjoy clicking a button for no reason lol</p>
     <button onclick="alert('Congrats you wasted a second of your time')">Click or Else</button>
 </section>
 
 
-<section id="Photo">
+<section id="">
     <h2>the gallery.</h2>
     <p>behold upon the derpiness</p>
     <img src="https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUycXFmcHYzcHdtMHNvdXRjMnNueW9jdnNleW81bDNzdWM3ZGQ0eHNldiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lxxOGaDRk4f7R5TkBd/200w.gif" alt="speed shocked" width="200">
@@ -70,13 +73,13 @@
 
 <section id="type" style="padding:50px; text-align:center; font-family: Consolas, 'Courier New', monospace;">
   <h2>type</h2>
-  <p>type stuff in the box (⌐■_■)</p>
+  <p>type stuff in the box</p>
 
   <input type="text" id="userInput" placeholder="Type here..." style="font-size:16px; padding:5px;">
   <div id="displayText" style="margin-top:20px; font-size:18px; color:green;"></div>
 </section>
 
-<section style="text-align:center; padding:40px; font-family: Consolas, 'Courier New', monospace;">
+<section id="time" style="text-align:center; padding:40px; font-family: Consolas, 'Courier New', monospace;">
   <h2>Time Spent On This Website</h2>
   <p id="counter">0h 0m 0s</p>
 
@@ -105,6 +108,44 @@
 </section>
 
 
+<section id="music" style="
+  text-align: center;
+  padding: 40px;
+  font-family: Consolas, 'Courier New', monospace;
+">
+
+<h2>music (⌐■_■)♫♪</h2>
+<p>gigachad theme</p>
+  <audio controls loop>
+    <source src="giga_chad.mp3">
+  </audio>
+  
+<p>among us drip</p>
+  <audio controls loop>
+    <source src="among_us.mp3">
+  </audio>
+
+  <p>hog rider</p>
+  <audio controls loop>
+    <source src="hog_rider.mp3">
+  </audio>
+
+    <p>lofi (be productive)</p>
+  <audio controls loop>
+    <source src="lofi.mp3">
+  </audio>
+
+</section>
+
+<script>
+  document.querySelectorAll("audio").forEach(a =>
+    a.addEventListener("play", () =>
+      document.querySelectorAll("audio").forEach(b => {
+        if (b !== a) b.pause();
+      })
+    )
+  );
+</script>
 
   <section id="contact">
     <h2>reach out to me for more LMAO</h2>
