@@ -1,7 +1,15 @@
-<p align="center">
-  <img src="logo.png" width="200">
-</p>
-# (╯°□°）╯ DaWebsite
+<table>
+  <tr>
+    <td width="180">
+      <img src="logo.png" width="160">
+    </td>
+    <td valign="middle">
+      <h2>(╯°□°）╯ DaWebsite</h2>
+      <p>pure chaos. zero purpose.</p>
+    </td>
+  </tr>
+</table>
+
 
 **A chaotic playground of pointless fun, memes, and weird interactive things!**
 
@@ -67,4 +75,4 @@ uh if u want to give feedback we could use uh a **contribution** post your ideas
 * GIFs and logos work best if hosted or in the same folder.
 * This is purely for fun — don’t take it seriously
 
-  ## -FeliPickle
+## -FeliPickle
