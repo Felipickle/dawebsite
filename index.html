@@ -114,8 +114,10 @@ button:active {
     <li><a href="#type">type stuf</a></li>
     <li><a href="#time">time wasted</a></li>
     <li><a href="#music">cool beats</a></li>
+    <li><a href="#picklegpt">the best AI</a></li>
     <li><a href="#game">game away</a></li>
     <li><a href="#contact">ask 4 more</a></li>
+    <li><a href="#credits">credits</a></li>
   </ul>
 </nav>
 
@@ -127,7 +129,7 @@ button:active {
 </section>
 
 
-<section id="">
+<section id="gallery">
     <h2>the gallery.</h2>
     <p>behold upon the derpiness</p>
     <img src="https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUycXFmcHYzcHdtMHNvdXRjMnNueW9jdnNleW81bDNzdWM3ZGQ0eHNldiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lxxOGaDRk4f7R5TkBd/200w.gif" alt="speed shocked" width="200">
@@ -233,6 +235,77 @@ button:active {
   );
 </script>
 
+<section id="picklegpt" style="
+  padding: 40px;
+  text-align: center;
+  font-family: Consolas, 'Courier New', monospace;
+">
+  <h2>PickleGPT ._.</h2>
+  <p>real ai</p>
+  <p>(trust)</p>
+
+  <div style="
+    max-width: 500px;
+    margin: auto;
+    border: 2px solid orange;
+    padding: 15px;
+  ">
+    <div id="pickleOutput" style="
+      min-height: 60px;
+      margin-bottom: 10px;
+      color: orange;
+    ">
+      PickleGPT is online.
+    </div>
+
+    <input
+      type="text"
+      id="pickleInput"
+      placeholder="ask me stuf."
+      style="
+        width: 80%;
+        padding: 6px;
+        font-family: Consolas, 'Courier New', monospace;
+      "
+    >
+    <br><br>
+    <button onclick="talkToPickleGPT()">send</button>
+  </div>
+</section>
+
+<script>
+  const pickleReplies = [
+    "i prefer if you leave the room.",
+    "i have analyzed this. get out.",
+    "why would you type that.",
+    "that’s crazy. anyway.",
+    "(╯°□°）╯︵ ┻━┻",
+    "PickleGPT does not get paid enough for this.",
+    "i am 100% confident. dont ask me why.",
+    "hmm… nah.",
+    "thats what she said.",
+    "i shouldn't question this."
+  ];
+
+  function talkToPickleGPT() {
+    const input = document.getElementById("pickleInput");
+    const output = document.getElementById("pickleOutput");
+
+    if (input.value.trim() === "") return;
+
+    output.textContent = "PickleGPT is thinking...";
+    
+    setTimeout(() => {
+      const randomReply =
+        pickleReplies[Math.floor(Math.random() * pickleReplies.length)];
+      output.textContent = randomReply;
+    }, 900);
+
+    input.value = "";
+  }
+</script>
+
+
 <section id="game" style="text-align:center; padding:40px; font-family: Consolas, 'Courier New', monospace;">
   <h2>game (instant dopamine rush lol)</h2>
   <p>play space company (thnks <em>sparticle999</em>)</p>
@@ -244,12 +317,22 @@ button:active {
   <section id="contact">
     <h2>reach out to me for more LMAO</h2>
     <p>game recomendations, put ur face in the gallery or music recomendations</p>
-    <p>just ask me</p>
+    <p>there is a discussions section on the <strong>GITHUB REPO</strong> you can find me there<p>
     <p>made by <strong>FeliPickle</strong></p>
   </section>
 
   <footer>
     <p>Have a nice day</p>
   </footer>
+<section id="credits">
+  <h2>credits (i almost 4got)</h2>
+  <ul>
+    <li>thnks nintendo for da music</li>
+    <li>thnks FASSOUNDS for the lofi</li>
+    <li>thnks tenor for the gifs</li>
+    <li>thnks to u i guess</li>
+  </ul>
+</section>
+
 </body>
 </html>
