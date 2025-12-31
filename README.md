@@ -4,7 +4,7 @@
       <img src="logo.png" width="160">
     </td>
     <td valign="middle">
-      <h2>(╯°□°）╯ DaWebsite</h2>
+      <h2>  (╯°□°）╯ DaWebsite</h2>
       <p>pure chaos. zero purpose.</p>
     </td>
   </tr>
