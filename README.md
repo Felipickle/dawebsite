@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="logo.png" width="200">
+</p>
 # (╯°□°）╯ DaWebsite
 
 **A chaotic playground of pointless fun, memes, and weird interactive things!**
