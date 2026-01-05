@@ -92,6 +92,41 @@ button:active {
     body {
       font-family: Consolas, 'Courier New', monospace;
     }
+
+
+    .school-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+.school-link {
+  display: inline-block;
+  padding: 25px 40px;
+  font-size: 22px;
+  font-weight: bold;
+  text-decoration: none;
+
+  color: orange;
+  background: black;
+  border: 4px solid orange;
+  border-radius: 10px;
+
+  transition: 0.15s ease;
+}
+
+.school-link:hover {
+  background: orange;
+  color: black;
+  transform: translateY(-4px);
+}
+
+.school-link:active {
+  transform: translateY(1px);
+}
+
   </style>
 </head>
 
@@ -322,6 +357,19 @@ button:active {
     <p>there is a discussions section on the <strong>GITHUB REPO</strong> you can find me there<p>
     <p>made by <strong>FeliPickle</strong></p>
   </section>
+
+<section id="school" style="text-align:center; padding:40px; font-family: Consolas, 'Courier New', monospace;">
+  <h2>school links</h2>
+  <p>its important to work too</p>
+
+  <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-top:20px;">
+    <a href="https://login.classlink.com" target="_blank" class="school-link">Classlink</a>
+    <a href="https://evergreen.flexisched.net" target="_blank" class="school-link">Flexisched</a>
+    <a href="https://ww.q.wa-k12.net" target="_blank" class="school-link">Skyward</a>
+    <a href="https://outlook.live.com" target="_blank" class="school-link">Outlook</a>
+  </div>
+</section>
+
 
   <footer>
     <p>Have a nice day</p>
