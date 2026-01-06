@@ -331,12 +331,51 @@ button:active {
 </section><br>
 
 
+<section id="lagger" style="text-align:center; padding:40px;">
+  <h2>click here to let bob lag your cite</h2>
+  <p>its safe (i think)</p>
+  <button onclick="bobFreeze()">let bob cook</button>
+</section>
+
+<script>
+function bobFreeze() {
+  alert("there is no turning back...");
+
+  const body = document.body;
+  let strobe = true;
+
+  // Freeze + strobe for 5 seconds
+  const strobeInterval = setInterval(() => {
+    body.style.background = strobe ? "black" : "orange";
+    strobe = !strobe;
+  }, 100); // 500ms = 10 flashes/sec
+
+  // Lock user input visually by covering everything (optional)
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.zIndex = "9999";
+  overlay.style.cursor = "wait";
+  body.appendChild(overlay);
+
+  // Stop after 5 seconds
+  setTimeout(() => {
+    clearInterval(strobeInterval);
+    body.style.background = ""; // back to normal
+    overlay.remove();           // remove overlay
+    alert("u survived... not 4 long");
+  }, 1000000000);
+}
+</script>
+
+
+
 
 <section id="game" style="text-align:center; padding:40px; font-family: Consolas, 'Courier New', monospace;">
   <h2>game (instant dopamine rush lol)</h2>
   <p>play my game pls</p>
 <a href="https://felipickle.github.io" class="play-btn">
-  ▶ PLAY HOLLOW KNIGHT
+  ▶ play hollow knight
 </a>
 </section>
 
