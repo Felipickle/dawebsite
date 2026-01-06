@@ -101,16 +101,103 @@ button:active {
   flex-wrap: wrap;
   margin-top: 25px;
 }
+
+#titleScreen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+/* pixel background layer */
+.pixel-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,165,0,0.08) 0px,
+      rgba(255,165,0,0.08) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,165,0,0.05) 0px,
+      rgba(255,165,0,0.05) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+  animation: pixelDrift 20s linear infinite;
+}
+
+/* slow pixel movement */
+@keyframes pixelDrift {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 200px 200px, -200px 100px; }
+}
+
+/* content */
+.title-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: Consolas, 'Courier New', monospace;
+  color: orange;
+  text-align: center;
+}
+
+/* title */
+.title-content h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 0 black;
+}
+
+/* play button */
+.title-content button {
+  font-size: 1.4rem;
+  padding: 12px 28px;
+  background: black;
+  color: orange;
+  border: 2px solid orange;
+  cursor: pointer;
+}
+
+.title-content button:hover {
+  background: orange;
+  color: black;
+}
+
+
   </style>
 </head>
 
 <body>
+<div id="titleScreen">
+  <div class="ambient-bg"></div>
+
+  <div class="title-content">
+    <h1>(╯°□°）╯ DAWEBSITE</h1>
+    <button onclick="enterHome()">▶ PLAY</button>
+  </div>
+</div>
+
+<script>
+function enterHome() {
+  document.getElementById("titleScreen").style.display = "none";
+}
+</script>
   <audio controls autoplay loop>
     <source src="wii-shop.mp3">
   </audio>
 <header style="display: flex; align-items: center; gap: 15px; padding: 20px;">
-  <img src="logo.png" alt="DaWebsite Logo" width="80" style="border-radius: 12px; box-shadow: 0 0 10px #ff8800;">
-  <h1>(╯°□°）╯ DaWebsite v.3.6</h1>
+  <img src="logo.png" alt="DaWebsite Logo" width="80" style="border-radius: 12px;">
+  <h1>(╯°□°）╯ DaWebsite</h1>
 </header>
     <div>
     <h6>wow so cool!</h6><hr>
@@ -375,7 +462,7 @@ function bobFreeze() {
   <h2>game (instant dopamine rush lol)</h2>
   <p>play my game pls</p>
 <a href="https://felipickle.github.io" class="play-btn">
-  ▶ play hollow knight
+  ▶ play
 </a>
 </section>
 
