@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DaWebsite</title>
   <style>
+    body {
+  color: #f5f5f5; /* or white, light gray, etc */
+}
 * {
   box-sizing: border-box;
 }
@@ -214,409 +217,6 @@ button:active {
     </div>
   </header>
 
-<script>
-// User System
-let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
-let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
-
-// Chat System
-let posts = JSON.parse(localStorage.getItem("chatPosts")) || [];
-
-// Cross-computer sharing via URL hash
-function loadSharedChat() {
-  const hash = window.location.hash.substring(1);
-  if (hash) {
-    try {
-      const sharedData = JSON.parse(decodeURIComponent(hash));
-      if (sharedData.posts && Array.isArray(sharedData.posts)) {
-        posts = sharedData.posts;
-        localStorage.setItem("chatPosts", JSON.stringify(posts));
-        renderPosts();
-      }
-    } catch (e) {
-      console.log("Invalid shared chat data");
-    }
-  }
-}
-
-function shareChat() {
-  const chatData = {
-    posts: posts,
-    sharedAt: new Date().toISOString()
-  };
-  const encodedData = encodeURIComponent(JSON.stringify(chatData));
-  const shareUrl = window.location.origin + window.location.pathname + '#' + encodedData;
-  
-  // Copy to clipboard
-  navigator.clipboard.writeText(shareUrl).then(() => {
-    alert("Chat URL copied to clipboard! Share this URL with your friend to sync messages.");
-  }).catch(() => {
-    // Fallback for older browsers
-    const textArea = document.createElement("textarea");
-    textArea.value = shareUrl;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-    alert("Chat URL copied to clipboard! Share this URL with your friend to sync messages.");
-  });
-}
-
-// Migrate old posts that have titles to new format
-posts = posts.map(post => {
-  if (post.title) {
-    // Convert old post with title to just content
-    return {
-      id: post.id,
-      userId: post.userId || null,
-      userName: post.userName || 'Anonymous',
-      content: post.title + ": " + post.content,
-      timestamp: post.timestamp,
-      replies: (post.replies || []).map(reply => ({
-        id: reply.id,
-        userId: reply.userId || null,
-        userName: reply.userName || 'Anonymous',
-        content: reply.content,
-        timestamp: reply.timestamp
-      }))
-    };
-  }
-  // Ensure all posts have user info
-  return {
-    id: post.id,
-    userId: post.userId || null,
-    userName: post.userName || 'Anonymous',
-    content: post.content,
-    timestamp: post.timestamp,
-    replies: (post.replies || []).map(reply => ({
-      id: reply.id,
-      userId: reply.userId || null,
-      userName: reply.userName || 'Anonymous',
-      content: reply.content,
-      timestamp: reply.timestamp
-    }))
-  };
-});
-
-// Daily reset functionality
-const today = new Date().toDateString();
-const lastReset = localStorage.getItem("chatLastReset");
-
-if (lastReset !== today) {
-  // It's a new day, reset the chat
-  posts = [];
-  localStorage.setItem("chatPosts", JSON.stringify(posts));
-  localStorage.setItem("chatLastReset", today);
-}
-
-function updateSharedUrl() {
-  const chatData = {
-    posts: posts,
-    sharedAt: new Date().toISOString()
-  };
-  const encodedData = encodeURIComponent(JSON.stringify(chatData));
-  window.location.hash = encodedData;
-}
-
-// User Functions
-function registerUser(name, email = "", password = "") {
-  // Check if user already exists
-  const existingUser = users.find(u => u.name.toLowerCase() === name.toLowerCase());
-  if (existingUser) {
-    alert("Username already taken! Please choose a different name.");
-    return false;
-  }
-
-  const user = {
-    id: Date.now(),
-    name: name.trim(),
-    email: email.trim(),
-    password: password, // In a real app, this would be hashed
-    createdAt: new Date().toISOString()
-  };
-
-  users.push(user);
-  localStorage.setItem("registeredUsers", JSON.stringify(users));
-
-  // Auto-login after registration
-  currentUser = user;
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
-  // Clear form
-  document.getElementById("userName").value = "";
-  document.getElementById("userPassword").value = "";
-
-  updateUserUI();
-  return true;
-}
-
-function loginUser(name, password = "") {
-  const user = users.find(u => u.name.toLowerCase() === name.toLowerCase());
-  if (!user) {
-    alert("User not found! Please register first.");
-    return false;
-  }
-
-  // Simple password check (in real app, compare hashes)
-  if (password && user.password !== password) {
-    alert("Incorrect password!");
-    return false;
-  }
-
-  currentUser = user;
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
-  // Clear form
-  document.getElementById("userName").value = "";
-  document.getElementById("userPassword").value = "";
-
-  updateUserUI();
-  return true;
-}
-
-function logoutUser() {
-  currentUser = null;
-  localStorage.removeItem("currentUser");
-  updateUserUI();
-}
-
-function updateUserUI() {
-  const userDisplay = document.getElementById("userDisplay");
-  const loginForm = document.getElementById("loginForm");
-  const chatForm = document.getElementById("chatForm");
-
-  if (currentUser) {
-    userDisplay.innerHTML = `
-      <span style="color: #ffb347;">Welcome, ${currentUser.name}!</span>
-      <button onclick="logoutUser()" style="margin-left: 10px; padding: 5px 10px; font-size: 12px;">Logout</button>
-    `;
-    loginForm.style.display = "none";
-    chatForm.style.display = "block";
-  } else {
-    userDisplay.innerHTML = "";
-    loginForm.style.display = "block";
-    chatForm.style.display = "none";
-  }
-}
-
-function createPost() {
-  if (!currentUser) {
-    alert("Please login first!");
-    return;
-  }
-
-  const content = document.getElementById("postContent").value.trim();
-
-  if (!content) {
-    alert("Please write a message!");
-    return;
-  }
-
-  const post = {
-    id: Date.now(),
-    userId: currentUser.id,
-    userName: currentUser.name,
-    content: content,
-    timestamp: new Date().toLocaleString(),
-    replies: []
-  };
-
-  posts.push(post); // Add to end of array (chronological order)
-  localStorage.setItem("chatPosts", JSON.stringify(posts));
-
-  // Update shared URL
-  updateSharedUrl();
-
-  // Clear form
-  document.getElementById("postContent").value = "";
-
-  renderPosts();
-}
-
-function createReply(postId, replyContent) {
-  if (!currentUser) {
-    alert("Please login first!");
-    return;
-  }
-
-  if (!replyContent.trim()) return;
-
-  const post = posts.find(p => p.id === postId);
-  if (post) {
-    const reply = {
-      id: Date.now(),
-      userId: currentUser.id,
-      userName: currentUser.name,
-      content: replyContent,
-      timestamp: new Date().toLocaleString()
-    };
-
-    post.replies.push(reply);
-    localStorage.setItem("chatPosts", JSON.stringify(posts));
-    renderPosts();
-  }
-}
-
-function renderPosts() {
-  const container = document.getElementById("postsContainer");
-  const noPosts = document.getElementById("noPosts");
-
-  if (posts.length === 0) {
-    noPosts.style.display = "block";
-    return;
-  }
-
-  noPosts.style.display = "none";
-  container.innerHTML = "";
-
-  posts.forEach(post => {
-    const postDiv = document.createElement("div");
-    postDiv.style.cssText = `
-      background: rgba(255, 179, 71, 0.05);
-      border: 1px solid #ffb347;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 10px;
-    `;
-
-    postDiv.innerHTML = `
-      <div style="display: flex; align-items: center; margin-bottom: 8px;">
-        <strong style="color: #ffb347; margin-right: 10px;">${post.userName || 'Anonymous'}</strong>
-        <small style="color: #888; font-size: 12px;">${post.timestamp}</small>
-      </div>
-      <p style="margin: 0 0 8px 0; color: #f5f5f5; line-height: 1.4;">${post.content}</p>
-
-      ${post.replies.length > 0 ? `
-        <div class="replies" style="border-top: 1px solid #444; padding-top: 10px; margin-top: 10px;">
-          ${post.replies.map(reply => `
-            <div style="background: rgba(0,0,0,0.3); padding: 8px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #ffb347;">
-              <div style="display: flex; align-items: center; margin-bottom: 4px;">
-                <strong style="color: #ddd; font-size: 12px; margin-right: 8px;">${reply.userName || 'Anonymous'}</strong>
-                <small style="color: #888; font-size: 11px;">${reply.timestamp}</small>
-              </div>
-              <p style="margin: 0; color: #ddd; font-size: 14px;">${reply.content}</p>
-            </div>
-          `).join("")}
-        </div>
-      ` : ''}
-
-      <div style="margin-top: 10px;">
-        <input type="text" placeholder="Reply..." style="width: 75%; padding: 5px; border: 1px solid #ffb347; border-radius: 3px; background: rgba(0,0,0,0.5); color: #f5f5f5; font-size: 14px;" maxlength="200" onkeypress="if(event.key === 'Enter') { createReply(${post.id}, this.value); this.value = ''; }">
-        <button onclick="createReply(${post.id}, this.previousElementSibling.value); this.previousElementSibling.value = '';" style="padding: 5px 10px; background: #ffb347; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;">Reply</button>
-      </div>
-    `;
-
-    container.appendChild(postDiv);
-  });
-
-  // Auto-scroll to bottom
-  container.scrollTop = container.scrollHeight;
-}
-
-// Load saved customizations (keeping existing ones)
-window.onload = function() {
-  const savedBg = localStorage.getItem("bgColor");
-  if (savedBg) document.body.style.background = savedBg;
-
-  const savedText = localStorage.getItem("textColor");
-  if (savedText) document.body.style.color = savedText;
-
-  const savedFont = localStorage.getItem("fontChange");
-  if (savedFont) document.body.style.fontFamily = savedFont;
-
-  const savedButtonStyle = localStorage.getItem("buttonStyle");
-  if (savedButtonStyle) {
-    const style = document.createElement('style');
-    style.textContent = `button { background: ${savedButtonStyle} !important; }`;
-    document.head.appendChild(style);
-  }
-
-  if (localStorage.getItem("secretMusicUnlocked")) {
-    const musicSection = document.getElementById("music");
-    const newAudio = document.createElement("audio");
-    newAudio.controls = true;
-    newAudio.loop = true;
-    newAudio.innerHTML = '<source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav">';
-    musicSection.appendChild(document.createElement("p")).textContent = "🔥 secret bell sound 🔥";
-    musicSection.appendChild(newAudio);
-  }
-
-  if (localStorage.getItem("galleryUnlocked")) {
-    const gallerySection = document.getElementById("gallery");
-    const newImg = document.createElement("img");
-    newImg.src = "https://media.tenor.com/2uiOoF6x9XUAAAAM/rickroll-rick.gif";
-    newImg.alt = "rickroll";
-    newImg.width = "200";
-    gallerySection.appendChild(newImg);
-  }
-
-  if (localStorage.getItem("particlesEnabled")) {
-    const particleScript = document.createElement('script');
-    particleScript.textContent = `
-      setInterval(() => {
-        const particle = document.createElement('div');
-        particle.style.position = 'fixed';
-        particle.style.left = Math.random() * 100 + 'vw';
-        particle.style.top = '-10px';
-        particle.style.width = '5px';
-        particle.style.height = '5px';
-        particle.style.background = '#ffb347';
-        particle.style.borderRadius = '50%';
-        particle.style.pointerEvents = 'none';
-        particle.style.animation = 'fall 3s linear';
-        document.body.appendChild(particle);
-        setTimeout(() => particle.remove(), 3000);
-      }, 200);
-
-      const style = document.createElement('style');
-      style.textContent = '@keyframes fall { to { transform: translateY(100vh); } }';
-      document.head.appendChild(style);
-    `;
-    document.body.appendChild(particleScript);
-  }
-
-  if (localStorage.getItem("darkModeEnabled")) {
-    // Dark mode toggle is now in settings panel
-  }
-
-  if (localStorage.getItem("gameUnlocked")) {
-    const gameSection = document.createElement('section');
-    gameSection.id = 'miniGame';
-    gameSection.innerHTML = `
-      <h2>Mini Game!</h2>
-      <p>Click the target as fast as possible!</p>
-      <div id="gameArea" style="width: 300px; height: 300px; background: #333; position: relative; margin: 20px auto; border: 2px solid #ffb347;">
-        <div id="target" style="width: 30px; height: 30px; background: #ff4757; position: absolute; cursor: pointer; border-radius: 50%;"></div>
-      </div>
-      <p>Score: <span id="score">0</span></p>
-    `;
-    document.getElementById('chat').parentNode.insertBefore(gameSection, document.getElementById('chat'));
-
-    // Add game logic
-    let score = 0;
-    const target = document.getElementById('target');
-    const scoreEl = document.getElementById('score');
-
-    function moveTarget() {
-      target.style.left = Math.random() * 270 + 'px';
-      target.style.top = Math.random() * 270 + 'px';
-    }
-
-    target.onclick = () => {
-      score++;
-      scoreEl.textContent = score;
-      moveTarget();
-    };
-
-    moveTarget();
-  }
-
-  updateUserUI(); // Initialize user interface
-  loadSharedChat(); // Load shared chat data from URL
-  renderPosts(); // Load and display chat posts
-};
-</script>
-
 <nav>
   <ul>
     <li><a href="#Button">The Infamous Button</a></li>
@@ -627,7 +227,6 @@ window.onload = function() {
     <li><a href="#music">cool beats</a></li>
     <li><a href="#picklegpt">the best AI</a></li>
     <li><a href="#school">school links</a></li>
-    <li><a href="#chat">public chat</a></li>
     <li><a href="#game">game away</a></li>
     <li><a href="#contact">ask 4 more</a></li>
     <li><a href="#credits">credits</a></li>
@@ -1073,43 +672,96 @@ function submitOrder() {
 }
 </script>
 
-<section id="chat" style="padding:40px; font-family: Consolas, 'Courier New', monospace;">
-  <h2 style="text-align: center;">Chet</h2>
-  <p style="text-align: center;">Chet with other people<small style="color: #888;">(Resets daily)</small></p>
+<section style="text-align:center; padding:40px; font-family: Consolas, 'Courier New', monospace;">
+  <h2>Do Not Open</h2>
 
-  <div style="max-width: 800px; margin: 0 auto;">
-    <!-- Login/Register Form -->
-    <div id="loginForm" style="background: rgba(255, 179, 71, 0.1); border: 2px solid #ffb347; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-      <h3>Login or Register</h3>
-      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-        <input type="text" id="userName" placeholder="Your name..." style="flex: 1; padding: 8px; border: 1px solid #ffb347; border-radius: 3px; background: rgba(0,0,0,0.5); color: #f5f5f5;" maxlength="20">
-        <input type="password" id="userPassword" placeholder="Password (optional)" style="flex: 1; padding: 8px; border: 1px solid #ffb347; border-radius: 3px; background: rgba(0,0,0,0.5); color: #f5f5f5;" maxlength="50">
-      </div>
-      <div style="display: flex; gap: 10px;">
-        <button onclick="registerUser(document.getElementById('userName').value, '', document.getElementById('userPassword').value)" style="flex: 1; padding: 8px;">Register</button>
-        <button onclick="loginUser(document.getElementById('userName').value, document.getElementById('userPassword').value)" style="flex: 1; padding: 8px;">Login</button>
-      </div>
-      <p style="font-size: 12px; color: #888; margin-top: 10px;">Password is optional for simple name registration</p>
-    </div>
+  <button id="dangerBtn"
+    onclick="clickButton()"
+    style="padding:20px 30px; font-size:18px; cursor:pointer;">
+    Do not open
+  </button>
 
-    <!-- Chat Form -->
-    <div id="chatForm" style="background: rgba(255, 179, 71, 0.1); border: 2px solid #ffb347; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none;">
-      <h3>Send a Message</h3>
-      <textarea id="postContent" placeholder="What's on your mind?" style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ffb347; border-radius: 5px; background: rgba(0,0,0,0.5); color: #f5f5f5; resize: vertical;" maxlength="500" onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); createPost(); }"></textarea>
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button onclick="createPost()" style="flex: 1; padding: 10px;">Send</button>
-        <button onclick="shareChat()" style="flex: 1; padding: 10px; background: #4CAF50 !important;">Share Chat</button>
-      </div>
-    </div>
-
-    <!-- Posts Container -->
-    <div id="postsContainer" style="background: rgba(0,0,0,0.3); border: 2px solid #333; padding: 20px; border-radius: 12px; min-height: 300px; max-height: 500px; overflow-y: auto;">
-      <div id="noPosts" style="text-align: center; color: #888; padding: 40px;">
-        No messages yet. Login to start chatting!
-      </div>
-    </div>
-  </div>
+  <div id="result" style="margin-top:30px; font-size:40px;"></div>
 </section>
+
+<script>
+let clicks = 0;
+
+const messages = [
+  // 1–10: Polite denial
+  "Do not open",
+  "Please don’t",
+  "Hey. Stop.",
+  "Seriously, don’t.",
+  "This is a bad idea",
+  "You can still turn back",
+  "I’m asking nicely",
+  "Please",
+  "Why are you hovering",
+  "Okay, stop",
+
+  // 11–20: Annoyed
+  "I said stop",
+  "You’re not listening",
+  "This is uncomfortable",
+  "You’re testing me",
+  "Do something else",
+  "This button has feelings",
+  "I warned you",
+  "This is on you",
+  "Why though",
+  "Enough",
+
+  // 21–30: Panic
+  "STOP",
+  "PLEASE STOP",
+  "I am begging you",
+  "This was preventable",
+  "You’re making it worse",
+  "I can’t undo this",
+  "Why are you like this",
+  "This is escalating",
+  "You promised you’d stop (you didn’t)",
+  "I don’t like this",
+
+  // 31–40: Acceptance
+  "Fine. Keep going.",
+  "I’ve lost control",
+  "This is happening",
+  "You win",
+  "I can’t stop you",
+  "I hope you’re happy",
+  "Nothing matters anymore",
+  "Just click it",
+  "We’re too far now",
+  "Almost there… I think",
+
+  // 41–49: Final warnings
+  "Last chance",
+  "This is your final warning",
+  "Do NOT click again",
+  "Seriously. Don’t.",
+  "Stop. Right. Now.",
+  "Please reconsider",
+  "This ends badly",
+  "I’m not responsible",
+  "Okay…",
+
+  // 50
+  "Fine."
+];
+
+function clickButton() {
+  clicks++;
+
+  if (clicks < 50) {
+    document.getElementById("dangerBtn").innerText = messages[clicks];
+  } else {
+    document.getElementById("dangerBtn").style.display = "none";
+    document.getElementById("result").innerText = "🧀";
+  }
+}
+</script>
 
 
   <section id="contact">
