@@ -203,7 +203,10 @@ button:active {
   </audio>
 <header style="display: flex; align-items: center; gap: 15px; padding: 20px;">
   <img src="logo.png" alt="DaWebsite Logo" width="80" style="border-radius: 12px;">
-  <h1>(╯°□°）╯ DaWebsite</h1>
+  <div>
+    <h1>(╯°□°）╯ DaWebsite</h1>
+    <p>Made by students for students</p>
+  </div>
   <div id="userDisplay" style="margin-left: auto;"></div>
 </header>
     <div>
@@ -218,6 +221,46 @@ let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
 
 // Chat System
 let posts = JSON.parse(localStorage.getItem("chatPosts")) || [];
+
+// Cross-computer sharing via URL hash
+function loadSharedChat() {
+  const hash = window.location.hash.substring(1);
+  if (hash) {
+    try {
+      const sharedData = JSON.parse(decodeURIComponent(hash));
+      if (sharedData.posts && Array.isArray(sharedData.posts)) {
+        posts = sharedData.posts;
+        localStorage.setItem("chatPosts", JSON.stringify(posts));
+        renderPosts();
+      }
+    } catch (e) {
+      console.log("Invalid shared chat data");
+    }
+  }
+}
+
+function shareChat() {
+  const chatData = {
+    posts: posts,
+    sharedAt: new Date().toISOString()
+  };
+  const encodedData = encodeURIComponent(JSON.stringify(chatData));
+  const shareUrl = window.location.origin + window.location.pathname + '#' + encodedData;
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    alert("Chat URL copied to clipboard! Share this URL with your friend to sync messages.");
+  }).catch(() => {
+    // Fallback for older browsers
+    const textArea = document.createElement("textarea");
+    textArea.value = shareUrl;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    alert("Chat URL copied to clipboard! Share this URL with your friend to sync messages.");
+  });
+}
 
 // Migrate old posts that have titles to new format
 posts = posts.map(post => {
@@ -266,8 +309,14 @@ if (lastReset !== today) {
   localStorage.setItem("chatLastReset", today);
 }
 
-// Save migrated data
-localStorage.setItem("chatPosts", JSON.stringify(posts));
+function updateSharedUrl() {
+  const chatData = {
+    posts: posts,
+    sharedAt: new Date().toISOString()
+  };
+  const encodedData = encodeURIComponent(JSON.stringify(chatData));
+  window.location.hash = encodedData;
+}
 
 // User Functions
 function registerUser(name, email = "", password = "") {
@@ -374,6 +423,9 @@ function createPost() {
 
   posts.push(post); // Add to end of array (chronological order)
   localStorage.setItem("chatPosts", JSON.stringify(posts));
+
+  // Update shared URL
+  updateSharedUrl();
 
   // Clear form
   document.getElementById("postContent").value = "";
@@ -560,6 +612,7 @@ window.onload = function() {
   }
 
   updateUserUI(); // Initialize user interface
+  loadSharedChat(); // Load shared chat data from URL
   renderPosts(); // Load and display chat posts
 };
 </script>
@@ -709,6 +762,23 @@ window.onload = function() {
   <p>real ai</p>
   <p>(trust)</p>
 
+  <div style="margin-bottom: 20px;">
+    <label style="color: orange; margin-right: 10px;">AI Mode:</label>
+    <select id="aiMode" onchange="changeAIMode()" style="
+      padding: 5px;
+      font-family: Consolas, 'Courier New', monospace;
+      background: rgba(0,0,0,0.5);
+      color: orange;
+      border: 1px solid orange;
+    ">
+      <option value="pickle">PickleGPT</option>
+      <option value="karen">Karen AI</option>
+      <option value="manager">manager AI</option>
+      <option value="watcher">watcher AI</option>
+      <option value="overconfident">overconfident AI</option>
+    </select>
+  </div>
+
   <div style="
     max-width: 500px;
     margin: auto;
@@ -752,23 +822,106 @@ window.onload = function() {
     "i shouldn't question this."
   ];
 
+  const karenReplies = [
+    "I demand to speak to the manager!",
+    "Do you know who I am? I want to speak to your supervisor RIGHT NOW!",
+    "This is unacceptable! I've been a customer here for years!",
+    "I pay good money for this service and this is what I get?",
+    "Let me speak to someone who actually knows what they're doing!",
+    "I've never been so insulted in my life!",
+    "This is an outrage! I want a full refund!",
+    "You clearly don't understand the severity of this situation!",
+    "I have rights, you know! I demand satisfaction!",
+    "This is completely unacceptable! Get me your manager immediately!"
+  ];
+
+  const managerReplies = [
+    "Thank you for bringing this to my attention.",
+    "I will escalate this appropriately.",
+    "Per policy, this is resolved.",
+    "We value your feedback.",
+    "I have reviewed the situation."
+  ];
+
+  const watcherReplies = [
+    "You're still here.",
+    "You scrolled.",
+    "You clicked that.",
+    "Interesting choice.",
+    "I noticed."
+  ];
+
+  const overconfidentReplies = [
+    "This is definitely correct.",
+    "Trust me.",
+    "I've seen this before.",
+    "No need to double-check.",
+    "This will work."
+  ];
+
+  let currentAIMode = localStorage.getItem("aiMode") || "pickle";
+
+  function changeAIMode() {
+    currentAIMode = document.getElementById("aiMode").value;
+    localStorage.setItem("aiMode", currentAIMode);
+    
+    const output = document.getElementById("pickleOutput");
+    if (currentAIMode === "karen") {
+      output.textContent = "Karen AI activated. What do you want?";
+    } else if (currentAIMode === "manager") {
+      output.textContent = "Manager AI online. How may I assist you today?";
+    } else if (currentAIMode === "watcher") {
+      output.textContent = "Watcher AI observing...";
+    } else if (currentAIMode === "overconfident") {
+      output.textContent = "Overconfident AI ready to solve everything!";
+    } else {
+      output.textContent = "PickleGPT is online.";
+    }
+  }
+
   function talkToPickleGPT() {
     const input = document.getElementById("pickleInput");
     const output = document.getElementById("pickleOutput");
 
     if (input.value.trim() === "") return;
 
-    output.textContent = "PickleGPT is thinking...";
+    if (currentAIMode === "karen") {
+      output.textContent = "Karen AI is processing your complaint...";
+    } else if (currentAIMode === "manager") {
+      output.textContent = "Manager AI reviewing your request...";
+    } else if (currentAIMode === "watcher") {
+      output.textContent = "Watcher AI observes your message...";
+    } else if (currentAIMode === "overconfident") {
+      output.textContent = "Overconfident AI knows exactly what to do...";
+    } else {
+      output.textContent = "PickleGPT is thinking...";
+    }
     
     setTimeout(() => {
-      const randomReply =
-        pickleReplies[Math.floor(Math.random() * pickleReplies.length)];
+      let randomReply;
+      if (currentAIMode === "karen") {
+        randomReply = karenReplies[Math.floor(Math.random() * karenReplies.length)];
+      } else if (currentAIMode === "manager") {
+        randomReply = managerReplies[Math.floor(Math.random() * managerReplies.length)];
+      } else if (currentAIMode === "watcher") {
+        randomReply = watcherReplies[Math.floor(Math.random() * watcherReplies.length)];
+      } else if (currentAIMode === "overconfident") {
+        randomReply = overconfidentReplies[Math.floor(Math.random() * overconfidentReplies.length)];
+      } else {
+        randomReply = pickleReplies[Math.floor(Math.random() * pickleReplies.length)];
+      }
       output.textContent = randomReply;
       addXP(5); // Earn XP for talking to AI
     }, 900);
 
     input.value = "";
   }
+
+  // Initialize AI mode on page load
+  window.addEventListener('load', function() {
+    document.getElementById("aiMode").value = currentAIMode;
+    changeAIMode(); // Set initial display
+  });
 </script>
 
 <section id="school" style="text-align:center; padding:40px;">
@@ -921,8 +1074,8 @@ function submitOrder() {
 </script>
 
 <section id="chat" style="padding:40px; font-family: Consolas, 'Courier New', monospace;">
-  <h2 style="text-align: center;">💬 Public Chat</h2>
-  <p style="text-align: center;">Chat with other visitors in real-time! <small style="color: #888;">(Resets daily)</small></p>
+  <h2 style="text-align: center;">Chet</h2>
+  <p style="text-align: center;">Chet with other people<small style="color: #888;">(Resets daily)</small></p>
 
   <div style="max-width: 800px; margin: 0 auto;">
     <!-- Login/Register Form -->
@@ -943,7 +1096,10 @@ function submitOrder() {
     <div id="chatForm" style="background: rgba(255, 179, 71, 0.1); border: 2px solid #ffb347; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none;">
       <h3>Send a Message</h3>
       <textarea id="postContent" placeholder="What's on your mind?" style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ffb347; border-radius: 5px; background: rgba(0,0,0,0.5); color: #f5f5f5; resize: vertical;" maxlength="500" onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); createPost(); }"></textarea>
-      <button onclick="createPost()" style="margin-top: 10px; padding: 10px 20px;">💬 Send</button>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button onclick="createPost()" style="flex: 1; padding: 10px;">Send</button>
+        <button onclick="shareChat()" style="flex: 1; padding: 10px; background: #4CAF50 !important;">Share Chat</button>
+      </div>
     </div>
 
     <!-- Posts Container -->
